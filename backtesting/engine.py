@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import numpy as np
 import pandas as pd
 import yfinance as yf
 
@@ -41,6 +42,27 @@ class VectorizedBacktester:
 
         self.strategy = strategy
         self.transaction_cost = transaction_cost
+
+    @staticmethod
+    def calculate_sharpe_ratio(
+        returns: pd.Series,
+        risk_free_rate: float = 0.0,
+        periods_per_year: int = 252,
+    ) -> float:
+        """
+        Compute the annualized Sharpe ratio from periodic strategy returns.
+
+        We treat each daily strategy return as one observation from the return
+        distribution, then compare the average excess return to its volatility.
+        """
+
+        excess_returns = returns - (risk_free_rate / periods_per_year)
+        volatility = excess_returns.std()
+
+        if np.isclose(volatility, 0.0):
+            return 0.0
+
+        return np.sqrt(periods_per_year) * (excess_returns.mean() / volatility)
 
     def fetch_data(
         self,
@@ -101,6 +123,7 @@ class VectorizedBacktester:
             "final_strategy_return": results["cumulative_strategy"].iloc[-1] - 1,
             "final_buy_hold_return": results["cumulative_buy_hold"].iloc[-1] - 1,
             "total_trades": results["trade_size"].sum(),
+            "sharpe_ratio": self.calculate_sharpe_ratio(results["strategy_return"]),
         }
 
         return BacktestResult(data=results, summary=summary)
