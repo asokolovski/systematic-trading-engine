@@ -1,3 +1,2 @@
 # systematic-trading-engine
-Hello, world!
-test test
+To Run: python3 -m pip install -r requirements.txt
