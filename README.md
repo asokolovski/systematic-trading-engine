@@ -55,3 +55,22 @@ keeps the contract small so you can focus on the core service flow:
 - FastAPI validates the contract
 - the backtester runs
 - JSON comes back out
+
+## 5. Run with Docker
+
+Build the image:
+
+```bash
+docker build -t systematic-trading-engine-api .
+```
+
+Run the container:
+
+```bash
+docker run --rm -p 8000:8000 systematic-trading-engine-api
+```
+
+Then open:
+- `http://127.0.0.1:8000/docs`
+- `http://127.0.0.1:8000/health`
+
